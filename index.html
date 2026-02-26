@@ -57,29 +57,35 @@
             gap: 28px;
         }
 
-        .welcome-header h2 {
-            font-weight: 600;
-            font-size: 26px;
-            color: #ffffff;
-            letter-spacing: -0.2px;
+        .welcome-header {
             display: flex;
             align-items: center;
-            gap: 10px;
+            flex-wrap: wrap;
+            gap: 8px 12px;
         }
 
-        .welcome-header h2 span {
+        .logo {
+            height: 44px;
+            width: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        .beta-badge {
             background: #7d6cf0;
             padding: 6px 14px;
             border-radius: 60px;
             font-size: 16px;
             font-weight: 500;
             color: white;
+            white-space: nowrap;
         }
 
         .welcome-header p {
             font-size: 15px;
             color: #b5b2d0;
-            margin-top: 8px;
+            width: 100%;
+            margin-top: 4px;
             line-height: 1.5;
         }
 
@@ -330,6 +336,17 @@
             text-align: center;
         }
 
+        /* responsive adjustments for logo */
+        @media (max-width: 600px) {
+            .logo {
+                height: 34px;
+            }
+            .beta-badge {
+                padding: 4px 10px;
+                font-size: 14px;
+            }
+        }
+
         @media (max-width: 950px) {
             .app-grid {
                 flex-direction: column;
@@ -345,10 +362,11 @@
 <body>
 <div class="glass-app">
     <div class="app-grid">
-        <!-- LEFT: friendly controls -->
+        <!-- LEFT: friendly controls with logo -->
         <div class="settings-panel">
             <div class="welcome-header">
-                <h2>✨ Carasoul Solvoro <span>beta</span></h2>
+                <img src="logo.png" alt="Carasoul Solvoro" class="logo" onerror="this.style.display='none'">
+                <span class="beta-badge">beta</span>
                 <p>make instagram slides in seconds · background stays saved</p>
             </div>
 
@@ -474,7 +492,7 @@
             canvas.setWidth(newWidth).setHeight(newHeight);
 
             if (oldBg) {
-                // re-set background with cover scale (or contain? we keep cover style)
+                // re-set background with cover scale
                 const img = oldBg;
                 const scale = Math.max(newWidth / img.width, newHeight / img.height);
                 img.set({
@@ -491,9 +509,8 @@
                 oldText.set({
                     left: newWidth / 2,
                     top: newHeight / 2,
+                    width: newWidth * 0.8  // keep 80% margin
                 });
-                // adjust textbox width for wrapping (keep some margin)
-                oldText.set({ width: newWidth * 0.8 }); // 80% of canvas
                 canvas.renderAll();
             } else {
                 // create default textbox after resize if missing
@@ -535,8 +552,6 @@
                         resizeCanvas(targetW, targetH);
                     }
                     // after possible resize, set background cover
-                    // but we need to get the img again? fabric image already has original size.
-                    // re-fetch or use current img? better set directly with proper scale
                     const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
                     img.set({
                         scaleX: scale,
@@ -774,5 +789,6 @@
         });
     })();
 </script>
+<!-- small fallback if logo.png missing: still shows beta badge -->
 </body>
 </html>
