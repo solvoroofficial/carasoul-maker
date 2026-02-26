@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>Carasoul Solvoro · Instagram carousel maker</title>
-    <!-- modern clean font -->
+    <title>Carasoul Solvoro · friendly carousel maker</title>
+    <!-- modern rounded font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <!-- Fabric.js for canvas manipulation -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Fabric.js for canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
     <style>
         * {
@@ -18,269 +18,264 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0a0a0c;
-            color: #eaeef2;
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(145deg, #0f0f17 0%, #1a1a28 100%);
+            color: #f0eef7;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
         }
 
-        .app-container {
-            width: 1440px;
+        .glass-app {
+            width: 1500px;
             max-width: 100%;
-            background: #121216;
-            border-radius: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+            background: rgba(22, 22, 30, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 48px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
             overflow: hidden;
-            backdrop-filter: blur(2px);
         }
 
-        .app-main {
+        .app-grid {
             display: flex;
             flex-direction: row;
-            min-height: 720px;
         }
 
-        /* left panel — controls */
-        .control-panel {
-            width: 360px;
-            background: #18181e;
+        /* left panel — fluffy controls */
+        .settings-panel {
+            width: 380px;
+            background: rgba(18, 18, 26, 0.7);
+            backdrop-filter: blur(8px);
             padding: 32px 24px;
-            border-right: 1px solid #2a2a32;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 28px;
         }
 
-        .panel-header h1 {
-            font-size: 22px;
+        .welcome-header h2 {
             font-weight: 600;
-            letter-spacing: -0.3px;
-            color: white;
+            font-size: 26px;
+            color: #ffffff;
+            letter-spacing: -0.2px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .panel-header h1 span {
-            background: #2f2f3a;
-            border-radius: 100px;
-            padding: 4px 10px;
-            font-size: 13px;
+        .welcome-header h2 span {
+            background: #7d6cf0;
+            padding: 6px 14px;
+            border-radius: 60px;
+            font-size: 16px;
             font-weight: 500;
-            color: #a0a4b0;
+            color: white;
         }
 
-        .control-section {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+        .welcome-header p {
+            font-size: 15px;
+            color: #b5b2d0;
+            margin-top: 8px;
+            line-height: 1.5;
         }
 
-        .section-title {
-            font-size: 14px;
+        .card {
+            background: rgba(12, 12, 20, 0.6);
+            border-radius: 32px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 20px 30px -20px black;
+        }
+
+        .card-title {
+            font-size: 16px;
             font-weight: 600;
+            color: #cbc8ff;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #7f8493;
+            letter-spacing: 0.3px;
         }
 
-        .upload-area {
-            background: #22222a;
-            border-radius: 20px;
-            padding: 20px 16px;
-            border: 1px dashed #3b3b48;
-            transition: 0.2s;
+        .upload-drop {
+            background: rgba(38, 35, 58, 0.6);
+            border-radius: 28px;
+            padding: 24px 16px;
+            border: 2px dashed #5a4d9c;
             text-align: center;
+            transition: 0.2s;
+            cursor: pointer;
         }
 
-        .upload-area:hover {
-            border-color: #6161b3;
-            background: #26262e;
+        .upload-drop:hover {
+            background: #322f4a;
+            border-color: #9b8cff;
         }
 
         .upload-label {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             cursor: pointer;
         }
 
-        .upload-label svg {
-            opacity: 0.7;
+        .upload-label .icon {
+            font-size: 36px;
+            filter: drop-shadow(0 6px 8px #00000050);
         }
 
-        .upload-label span {
-            font-size: 14px;
-            font-weight: 500;
-            color: #cacfe0;
-        }
-
-        .upload-label small {
-            font-size: 12px;
-            color: #6b6f80;
-        }
-
-        #bgUpload {
-            display: none;
-        }
-
-        .bg-status {
+        .bg-preview {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-top: 12px;
-            background: #1b1b22;
+            background: #1d1b2b;
             border-radius: 40px;
-            padding: 8px 12px 8px 16px;
+            padding: 10px 16px;
+            margin-top: 14px;
+            font-size: 14px;
         }
 
-        .bg-status span {
-            font-size: 13px;
-            color: #b9bed0;
-        }
-
-        .clear-bg-btn {
+        .chip-button {
             background: none;
             border: none;
-            color: #a7a9c0;
+            color: #f0d6ff;
             font-size: 18px;
             cursor: pointer;
-            padding: 0 6px;
-            transition: 0.2s;
+            padding: 0 8px;
         }
 
-        .clear-bg-btn:hover {
-            color: #ff8a8a;
+        /* canvas size toggle */
+        .size-options {
+            display: flex;
+            gap: 12px;
+            margin: 8px 0;
+        }
+
+        .size-btn {
+            flex: 1;
+            background: #222032;
+            border: 1px solid #3e3b58;
+            border-radius: 40px;
+            padding: 12px 0;
+            font-weight: 600;
+            color: #cbc8f0;
+            cursor: pointer;
+            transition: 0.15s;
+            font-size: 14px;
+        }
+
+        .size-btn.active {
+            background: #5f51c0;
+            border-color: #9b8aff;
+            color: white;
+            box-shadow: 0 8px 14px #2d218050;
         }
 
         /* text input */
-        .text-input-wrapper {
-            background: #22222a;
-            border-radius: 20px;
-            padding: 6px 6px 6px 18px;
+        .text-field {
+            background: #201f2c;
+            border-radius: 60px;
+            padding: 4px 4px 4px 24px;
             display: flex;
             align-items: center;
-            border: 1px solid #31313e;
-            transition: 0.15s;
+            border: 1px solid #4f4a70;
         }
 
-        .text-input-wrapper:focus-within {
-            border-color: #6d6df0;
-            box-shadow: 0 0 0 2px rgba(109, 109, 240, 0.25);
-        }
-
-        #textInput {
+        .text-field input {
             background: transparent;
             border: none;
-            padding: 14px 0;
-            font-size: 15px;
+            padding: 16px 0;
+            font-size: 16px;
             width: 100%;
             color: white;
             outline: none;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Quicksand', sans-serif;
         }
 
-        #textInput::placeholder {
-            color: #5c6070;
+        .text-field input::placeholder {
+            color: #7f7aa3;
         }
 
-        .slider-group, .select-group, .color-group {
+        .slider-item {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
-        .slider-label, .select-label, .color-label {
+        .slider-header {
             display: flex;
             justify-content: space-between;
             font-size: 14px;
-            color: #b3b9cc;
+            color: #cac5f0;
         }
 
         input[type=range] {
             width: 100%;
-            height: 5px;
-            background: #2e2e3a;
-            border-radius: 10px;
+            height: 6px;
+            background: #2d2a40;
+            border-radius: 20px;
             -webkit-appearance: none;
         }
 
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 22px;
+            height: 22px;
             background: #ffffff;
             border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid #7b7bf0;
-            box-shadow: 0 2px 8px black;
-        }
-
-        select, .color-row {
-            background: #22222a;
-            border: 1px solid #363646;
-            border-radius: 40px;
-            padding: 12px 18px;
-            font-size: 15px;
-            color: white;
-            outline: none;
-            font-family: 'Inter', sans-serif;
+            border: 2px solid #8a7cff;
+            box-shadow: 0 4px 10px black;
             cursor: pointer;
         }
 
         .color-row {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 6px 6px 6px 18px;
+            gap: 16px;
+            background: #201f2c;
+            border-radius: 60px;
+            padding: 8px 8px 8px 24px;
         }
 
         #textColor {
-            width: 48px;
-            height: 38px;
+            width: 50px;
+            height: 40px;
             border-radius: 30px;
-            border: none;
+            border: 2px solid #5550a0;
             background: transparent;
-            cursor: pointer;
         }
 
-        .shadow-toggle {
+        .shadow-check {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: #22222a;
-            border-radius: 40px;
-            padding: 8px 18px;
-            border: 1px solid #363646;
+            background: #201f2c;
+            border-radius: 60px;
+            padding: 12px 20px;
         }
 
-        .shadow-toggle label {
-            font-size: 14px;
-            color: #d3d8ec;
-        }
-
-        /* button group */
-        .action-buttons {
+        .action-row {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-            margin-top: 8px;
+            margin: 12px 0;
         }
 
         .btn {
-            background: #2b2b36;
-            border: 1px solid #3d3d4f;
-            padding: 12px 22px;
-            border-radius: 40px;
+            background: #2d2a44;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 50px;
             font-weight: 600;
-            font-size: 14px;
-            color: #eef2fa;
+            font-size: 15px;
+            color: #f0eaff;
             cursor: pointer;
             transition: 0.15s;
             flex: 1 0 auto;
@@ -288,189 +283,161 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
+            border: 1px solid #524d78;
         }
 
         .btn-primary {
-            background: #4b4be0;
-            border-color: #6d6df0;
+            background: #6c5ce7;
+            border-color: #9b8cff;
             color: white;
-            box-shadow: 0 6px 14px rgba(75, 75, 224, 0.25);
+            box-shadow: 0 10px 18px #3a2e9e40;
         }
 
         .btn-primary:hover {
-            background: #5d5dee;
+            background: #8171f0;
         }
 
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #4b4b70;
-        }
-
-        .btn-outline:hover {
-            background: #262632;
-        }
-
-        /* right panel — canvas preview */
-        .preview-panel {
+        .preview-area {
             flex: 1;
-            background: #0d0d10;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 30px 20px;
+            padding: 30px;
+            background: radial-gradient(circle at 30% 40%, #262337, #0c0b14);
         }
 
-        .canvas-wrapper {
-            width: 100%;
-            max-width: 600px;
-            aspect-ratio: 1 / 1;
-            border-radius: 32px;
-            background: #15151b;
-            box-shadow: 0 30px 40px -20px black, 0 0 0 1px #33333f inset;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+        .canvas-frame {
+            background: #161222;
+            border-radius: 40px;
+            padding: 16px;
+            box-shadow: 0 40px 70px -10px black, 0 0 0 1px #514b80 inset;
+            max-width: 100%;
+            transition: all 0.2s ease;
         }
 
         #carouselCanvas {
-            width: 100%;
-            height: 100%;
             display: block;
+            width: 100%;
+            height: auto;
             border-radius: 28px;
+            background: #18152a;
         }
 
-        /* mobile stack */
-        @media (max-width: 900px) {
-            .app-main {
+        .helper-note {
+            color: #8d87b5;
+            font-size: 13px;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        @media (max-width: 950px) {
+            .app-grid {
                 flex-direction: column;
             }
-            .control-panel {
+            .settings-panel {
                 width: 100%;
                 border-right: none;
-                border-bottom: 1px solid #2a2a32;
+                border-bottom: 1px solid #34304a;
             }
-            .canvas-wrapper {
-                max-width: 500px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .action-buttons .btn {
-                padding: 10px 14px;
-                font-size: 13px;
-            }
-        }
-
-        /* extra polish */
-        .value-badge {
-            background: #2a2a34;
-            padding: 4px 10px;
-            border-radius: 30px;
-            font-size: 13px;
-            color: white;
         }
     </style>
 </head>
 <body>
-<div class="app-container">
-    <div class="app-main">
-        <!-- LEFT CONTROL PANEL (dark, modern) -->
-        <div class="control-panel">
-            <div class="panel-header">
-                <h1>⫸ Carasoul Solvoro <span>v1.0</span></h1>
+<div class="glass-app">
+    <div class="app-grid">
+        <!-- LEFT: friendly controls -->
+        <div class="settings-panel">
+            <div class="welcome-header">
+                <h2>✨ Carasoul Solvoro <span>beta</span></h2>
+                <p>make instagram slides in seconds · background stays saved</p>
             </div>
 
-            <!-- BACKGROUND SECTION -->
-            <div class="control-section">
-                <div class="section-title">background</div>
-                <div class="upload-area">
+            <!-- Background card -->
+            <div class="card">
+                <div class="card-title">📸 1. your background</div>
+                <div class="upload-drop" id="uploadDrop">
                     <label for="bgUpload" class="upload-label">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a8b0d0" stroke-width="1.5"><path d="M3 16l5-5 3 3 4-4 3 3M4 20h16a2 2 0 002-2V6a2 2 0 00-2-2H4a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <span>Upload background</span>
-                        <small>JPG, PNG (saved automatically)</small>
+                        <span class="icon">🖼️</span>
+                        <span style="font-weight:600;">click to upload image</span>
+                        <span style="font-size:13px; color:#aaa2d5;">PNG or JPG (auto saved)</span>
                     </label>
-                    <input type="file" id="bgUpload" accept="image/png, image/jpeg, image/jpg, image/webp">
+                    <input type="file" id="bgUpload" accept="image/png, image/jpeg, image/jpg, image/webp" hidden>
                 </div>
-                <div class="bg-status" id="bgStatus">
-                    <span>💾 saved in browser</span>
-                    <button class="clear-bg-btn" id="clearBgBtn" title="remove background">✕</button>
-                </div>
-            </div>
-
-            <!-- TEXT INPUT -->
-            <div class="control-section">
-                <div class="section-title">your text</div>
-                <div class="text-input-wrapper">
-                    <input type="text" id="textInput" placeholder="Type caption... e.g. 'New collection'" value="Carasoul Solvoro">
+                <div class="bg-preview" id="bgStatus">
+                    <span>💾 <span id="bgMessage">no background yet</span></span>
+                    <button class="chip-button" id="clearBgBtn" title="remove">🗑️</button>
                 </div>
             </div>
 
-            <!-- TYPOGRAPHY TOOLS -->
-            <div class="control-section">
-                <div class="section-title">styling</div>
+            <!-- Canvas size toggles (friendly aspect control) -->
+            <div class="card">
+                <div class="card-title">🔲 2. canvas shape</div>
+                <div class="size-options">
+                    <button id="sizeSquareBtn" class="size-btn active">⬛ square 1:1</button>
+                    <button id="sizeMatchBtn" class="size-btn">🖼️ match image</button>
+                </div>
+                <p style="font-size:13px; margin-top:8px; color:#afa7dd;">"match image" adjusts canvas to your photo's proportions (max side 1080px)</p>
+            </div>
 
-                <!-- font size slider -->
-                <div class="slider-group">
-                    <div class="slider-label"><span>Font size</span><span id="fontSizeVal" class="value-badge">58</span></div>
-                    <input type="range" id="fontSizeSlider" min="16" max="140" value="58" step="1">
+            <!-- Text & styling -->
+            <div class="card">
+                <div class="card-title">✍️ 3. your message</div>
+                <div class="text-field">
+                    <input type="text" id="textInput" placeholder="e.g. 'summer vibes'" value="Carasoul Solvoro">
                 </div>
 
-                <!-- font weight -->
-                <div class="select-group">
-                    <div class="select-label">Weight</div>
-                    <select id="fontWeightSelect">
-                        <option value="normal">Regular</option>
-                        <option value="bold" selected>Bold</option>
+                <div style="margin: 16px 0 8px;">
+                    <div class="slider-item">
+                        <div class="slider-header"><span>🔤 size</span><span id="fontSizeVal" class="badge">58</span></div>
+                        <input type="range" id="fontSizeSlider" min="16" max="140" value="58" step="1">
+                    </div>
+                    <div class="slider-item">
+                        <div class="slider-header"><span>📏 line height</span><span id="lineHeightVal">1.3</span></div>
+                        <input type="range" id="lineHeightSlider" min="1.0" max="2.5" value="1.3" step="0.1">
+                    </div>
+                    <div class="slider-item">
+                        <div class="slider-header"><span>🧘 padding</span><span id="paddingVal">32</span></div>
+                        <input type="range" id="paddingSlider" min="0" max="120" value="32" step="2">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 16px; flex-wrap: wrap; margin: 6px 0;">
+                    <select id="fontWeightSelect" style="background:#201f2c; border-radius:60px; padding:12px 20px; border:1px solid #4f4a70; color:white; flex:1;">
+                        <option value="normal">Regular weight</option>
+                        <option value="bold" selected>Bold weight</option>
                     </select>
-                </div>
-
-                <!-- color picker -->
-                <div class="color-group">
-                    <div class="color-label">Text color</div>
-                    <div class="color-row">
+                    <div class="color-row" style="flex:1;">
                         <span>🎨</span>
                         <input type="color" id="textColor" value="#ffffff">
                     </div>
                 </div>
 
-                <!-- line height slider -->
-                <div class="slider-group">
-                    <div class="slider-label"><span>Line height</span><span id="lineHeightVal" class="value-badge">1.3</span></div>
-                    <input type="range" id="lineHeightSlider" min="1.0" max="2.5" value="1.3" step="0.1">
-                </div>
-
-                <!-- padding slider -->
-                <div class="slider-group">
-                    <div class="slider-label"><span>Padding (px)</span><span id="paddingVal" class="value-badge">32</span></div>
-                    <input type="range" id="paddingSlider" min="0" max="120" value="32" step="2">
-                </div>
-
-                <!-- optional text shadow toggle -->
-                <div class="shadow-toggle">
+                <div class="shadow-check">
                     <input type="checkbox" id="shadowToggle" checked>
-                    <label for="shadowToggle">✨ subtle text shadow</label>
+                    <label for="shadowToggle">🌒 soft shadow (makes text pop)</label>
                 </div>
             </div>
 
-            <!-- EXPORT & ACTIONS -->
-            <div class="control-section">
-                <div class="section-title">export slide</div>
-                <div class="action-buttons">
+            <!-- action buttons -->
+            <div class="card">
+                <div class="card-title">📥 4. export &amp; play</div>
+                <div class="action-row">
                     <button class="btn btn-primary" id="downloadPngBtn">📸 PNG</button>
                     <button class="btn btn-primary" id="downloadJpgBtn">🌅 JPG</button>
                 </div>
-                <div class="action-buttons" style="margin-top: 10px;">
-                    <button class="btn-outline btn" id="duplicateSlideBtn">➕ Duplicate slide</button>
-                    <button class="btn-outline btn" id="resetTextBtn">↺ reset text</button>
+                <div class="action-row">
+                    <button class="btn" id="duplicateSlideBtn">➕ duplicate text</button>
+                    <button class="btn" id="resetTextBtn">↺ reset style</button>
                 </div>
-                <p style="font-size:12px; color:#5a6072; margin-top: 18px; text-align:center;">background auto‑saves · 1080x1080</p>
+                <div class="helper-note">
+                    ⬇️ downloads at exact canvas size (ready for Instagram)
+                </div>
             </div>
         </div>
 
-        <!-- RIGHT PREVIEW (canvas) -->
-        <div class="preview-panel">
-            <div class="canvas-wrapper">
+        <!-- RIGHT: preview canvas -->
+        <div class="preview-area">
+            <div class="canvas-frame" id="canvasFrame">
                 <canvas id="carouselCanvas" width="1080" height="1080"></canvas>
             </div>
         </div>
@@ -479,83 +446,175 @@
 
 <script>
     (function() {
-        // ----- INIT FABRIC CANVAS (1080x1080) -----
-        const canvasElement = document.getElementById('carouselCanvas');
-        const canvas = new fabric.Canvas(canvasElement, {
+        // friendly canvas app
+        const canvasEl = document.getElementById('carouselCanvas');
+        let canvas = new fabric.Canvas(canvasEl, {
             enableRetinaScaling: true,
+            backgroundColor: '#18152a',
+            preserveObjectStacking: false,
             width: 1080,
-            height: 1080,
-            backgroundColor: '#1a1a20',  // fallback dark
-            preserveObjectStacking: false
+            height: 1080
         });
 
-        // ----- GLOBAL REFERENCES -----
-        let textbox = null;           // fabric.Textbox instance
+        let textbox = null;
         const STORAGE_KEY = 'carasoul_solvoro_bg';
 
-        // ----- HELPER: COVER SCALE FOR BACKGROUND -----
-        function setBackgroundCover(imgElement) {
-            const scale = Math.max(canvas.width / imgElement.width, canvas.height / imgElement.height);
+        // current image dimensions (for match mode)
+        let currentImageWidth = 1080, currentImageHeight = 1080; // fallback
+        let matchMode = false; // square by default
+
+        // ---- helper: resize canvas (preserve background & text centering) ----
+        function resizeCanvas(newWidth, newHeight) {
+            if (newWidth < 10 || newHeight < 10) return;
+
+            // store old background and text
+            const oldBg = canvas.backgroundImage;
+            const oldText = textbox;
+
+            canvas.setWidth(newWidth).setHeight(newHeight);
+
+            if (oldBg) {
+                // re-set background with cover scale (or contain? we keep cover style)
+                const img = oldBg;
+                const scale = Math.max(newWidth / img.width, newHeight / img.height);
+                img.set({
+                    scaleX: scale,
+                    scaleY: scale,
+                    left: (newWidth - img.width * scale) / 2,
+                    top: (newHeight - img.height * scale) / 2,
+                });
+                canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+            }
+
+            // re-center textbox
+            if (oldText) {
+                oldText.set({
+                    left: newWidth / 2,
+                    top: newHeight / 2,
+                });
+                // adjust textbox width for wrapping (keep some margin)
+                oldText.set({ width: newWidth * 0.8 }); // 80% of canvas
+                canvas.renderAll();
+            } else {
+                // create default textbox after resize if missing
+                initTextbox();
+            }
+            canvas.renderAll();
+        }
+
+        // ---- set background cover with given image element ----
+        function setBackgroundCover(imgElement, imgWidth, imgHeight) {
+            const scale = Math.max(canvas.width / imgWidth, canvas.height / imgHeight);
             imgElement.set({
                 scaleX: scale,
                 scaleY: scale,
-                left: (canvas.width - imgElement.width * scale) / 2,
-                top: (canvas.height - imgElement.height * scale) / 2,
+                left: (canvas.width - imgWidth * scale) / 2,
+                top: (canvas.height - imgHeight * scale) / 2,
                 originX: 'left',
                 originY: 'top'
             });
             canvas.setBackgroundImage(imgElement, canvas.renderAll.bind(canvas));
         }
 
-        // ----- LOAD BACKGROUND FROM LOCALSTORAGE (ON START) -----
+        // ---- load background from storage and optionally match mode ----
         function loadBackgroundFromStorage() {
             const savedDataURL = localStorage.getItem(STORAGE_KEY);
             if (savedDataURL) {
                 fabric.Image.fromURL(savedDataURL, (img) => {
-                    setBackgroundCover(img);
+                    currentImageWidth = img.width;
+                    currentImageHeight = img.height;
+                    if (matchMode) {
+                        // match canvas to image dimensions (cap longest side at 1080 to keep ui friendly)
+                        let targetW = img.width, targetH = img.height;
+                        const maxDim = 1080;
+                        if (targetW > maxDim || targetH > maxDim) {
+                            const ratio = Math.min(maxDim / targetW, maxDim / targetH);
+                            targetW = Math.floor(targetW * ratio);
+                            targetH = Math.floor(targetH * ratio);
+                        }
+                        resizeCanvas(targetW, targetH);
+                    }
+                    // after possible resize, set background cover
+                    // but we need to get the img again? fabric image already has original size.
+                    // re-fetch or use current img? better set directly with proper scale
+                    const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+                    img.set({
+                        scaleX: scale,
+                        scaleY: scale,
+                        left: (canvas.width - img.width * scale) / 2,
+                        top: (canvas.height - img.height * scale) / 2,
+                    });
+                    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+                    document.getElementById('bgMessage').innerText = 'background ready';
                 }, { crossOrigin: 'anonymous' });
+            } else {
+                document.getElementById('bgMessage').innerText = 'no background saved';
             }
         }
 
-        // ----- SAVE BACKGROUND TO LOCALSTORAGE (AS DATAURL) -----
+        // ---- save background dataURL ----
         function saveBackgroundToStorage(dataURL) {
             try {
                 localStorage.setItem(STORAGE_KEY, dataURL);
-                document.getElementById('bgStatus').querySelector('span').innerText = '💾 background saved';
+                document.getElementById('bgMessage').innerText = 'saved in browser';
             } catch (e) {
-                alert('Background too large for storage, try a smaller image.');
+                alert('Image too large for storage, try smaller.');
             }
         }
 
-        // ----- UPLOAD HANDLER -----
+        // ---- upload handler ----
         document.getElementById('bgUpload').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = (event) => {
                 const dataURL = event.target.result;
                 fabric.Image.fromURL(dataURL, (img) => {
-                    setBackgroundCover(img);
+                    currentImageWidth = img.width;
+                    currentImageHeight = img.height;
+
+                    if (matchMode) {
+                        let targetW = img.width, targetH = img.height;
+                        const maxDim = 1080;
+                        if (targetW > maxDim || targetH > maxDim) {
+                            const ratio = Math.min(maxDim / targetW, maxDim / targetH);
+                            targetW = Math.floor(targetW * ratio);
+                            targetH = Math.floor(targetH * ratio);
+                        }
+                        resizeCanvas(targetW, targetH);
+                    } else {
+                        // ensure canvas is square 1080
+                        if (canvas.width !== 1080 || canvas.height !== 1080) {
+                            resizeCanvas(1080, 1080);
+                        }
+                    }
+
+                    // now set background with cover on current canvas size
+                    const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+                    img.set({
+                        scaleX: scale,
+                        scaleY: scale,
+                        left: (canvas.width - img.width * scale) / 2,
+                        top: (canvas.height - img.height * scale) / 2,
+                    });
+                    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
                     saveBackgroundToStorage(dataURL);
                 }, { crossOrigin: 'anonymous' });
             };
             reader.readAsDataURL(file);
-            // reset input to allow re-upload same file
             this.value = '';
         });
 
-        // ----- CLEAR BACKGROUND -----
+        // clear background
         document.getElementById('clearBgBtn').addEventListener('click', function() {
             canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
             localStorage.removeItem(STORAGE_KEY);
-            document.getElementById('bgStatus').querySelector('span').innerText = '⛔ no background';
+            document.getElementById('bgMessage').innerText = 'no background';
         });
 
-        // ----- CREATE TEXTBOX (centered once, then live update) -----
+        // ---- textbox init / update ----
         function initTextbox() {
             if (textbox) canvas.remove(textbox);
-
             const text = document.getElementById('textInput').value || 'Carasoul Solvoro';
             const fontSize = parseInt(document.getElementById('fontSizeSlider').value, 10);
             const fontWeight = document.getElementById('fontWeightSelect').value;
@@ -575,57 +634,91 @@
                 lineHeight: lineHeight,
                 padding: padding,
                 textAlign: 'center',
-                fontFamily: 'Inter, sans-serif',
-                width: 880,              // fixed width for wrapping (1080 - 200 margin)
-                shadow: shadowEnabled ? 'rgba(0,0,0,0.45) 0px 8px 16px' : '',
-                splitByGrapheme: true,    // better wrapping
-                hasControls: false,        // keep clean, no borders
+                fontFamily: 'Quicksand, sans-serif',
+                width: canvas.width * 0.8,  // responsive width
+                shadow: shadowEnabled ? 'rgba(0,0,0,0.5) 0px 8px 18px' : '',
+                splitByGrapheme: true,
+                hasControls: false,
                 hasBorders: false,
                 lockScalingX: true,
                 lockScalingY: true,
-                lockRotation: true,
                 selectable: false,
                 evented: false
             });
-
             canvas.add(textbox);
             canvas.renderAll();
         }
 
-        // ----- UPDATE TEXTBOX PROPERTIES (called on any input change) -----
         function updateTextProperties() {
-            if (!textbox) {
-                initTextbox();
-                return;
-            }
-
-            const text = document.getElementById('textInput').value || ' ';
-            const fontSize = parseInt(document.getElementById('fontSizeSlider').value, 10);
-            const fontWeight = document.getElementById('fontWeightSelect').value;
-            const color = document.getElementById('textColor').value;
-            const lineHeight = parseFloat(document.getElementById('lineHeightSlider').value);
-            const padding = parseInt(document.getElementById('paddingSlider').value, 10);
-            const shadowEnabled = document.getElementById('shadowToggle').checked;
-
+            if (!textbox) { initTextbox(); return; }
             textbox.set({
-                text: text,
-                fontSize: fontSize,
-                fontWeight: fontWeight,
-                fill: color,
-                lineHeight: lineHeight,
-                padding: padding,
-                shadow: shadowEnabled ? 'rgba(0,0,0,0.45) 0px 8px 16px' : ''
+                text: document.getElementById('textInput').value || ' ',
+                fontSize: parseInt(document.getElementById('fontSizeSlider').value, 10),
+                fontWeight: document.getElementById('fontWeightSelect').value,
+                fill: document.getElementById('textColor').value,
+                lineHeight: parseFloat(document.getElementById('lineHeightSlider').value),
+                padding: parseInt(document.getElementById('paddingSlider').value, 10),
+                shadow: document.getElementById('shadowToggle').checked ? 'rgba(0,0,0,0.5) 0px 8px 18px' : ''
             });
-
             canvas.renderAll();
 
-            // update value badges
-            document.getElementById('fontSizeVal').innerText = fontSize;
-            document.getElementById('lineHeightVal').innerText = lineHeight.toFixed(1);
-            document.getElementById('paddingVal').innerText = padding;
+            // update small badges
+            document.getElementById('fontSizeVal').innerText = document.getElementById('fontSizeSlider').value;
+            document.getElementById('lineHeightVal').innerText = parseFloat(document.getElementById('lineHeightSlider').value).toFixed(1);
+            document.getElementById('paddingVal').innerText = document.getElementById('paddingSlider').value;
         }
 
-        // ----- RESET TEXT TO DEFAULT -----
+        // ---- toggle square / match mode ----
+        document.getElementById('sizeSquareBtn').addEventListener('click', function() {
+            this.classList.add('active');
+            document.getElementById('sizeMatchBtn').classList.remove('active');
+            matchMode = false;
+            if (canvas.width !== 1080 || canvas.height !== 1080) {
+                resizeCanvas(1080, 1080);
+            }
+        });
+
+        document.getElementById('sizeMatchBtn').addEventListener('click', function() {
+            this.classList.add('active');
+            document.getElementById('sizeSquareBtn').classList.remove('active');
+            matchMode = true;
+            // if we have a background image, resize to its dimensions
+            if (canvas.backgroundImage) {
+                const img = canvas.backgroundImage;
+                let targetW = img.width, targetH = img.height;
+                const maxDim = 1080;
+                if (targetW > maxDim || targetH > maxDim) {
+                    const ratio = Math.min(maxDim / targetW, maxDim / targetH);
+                    targetW = Math.floor(targetW * ratio);
+                    targetH = Math.floor(targetH * ratio);
+                }
+                resizeCanvas(targetW, targetH);
+            } else {
+                // no background, maybe keep previous but suggest upload
+                // do nothing
+            }
+        });
+
+        // ---- download ----
+        function download(format) {
+            const dataURL = canvas.toDataURL({ format: format, quality: 1 });
+            const link = document.createElement('a');
+            link.download = `carasoul.${format}`;
+            link.href = dataURL;
+            link.click();
+        }
+
+        document.getElementById('downloadPngBtn').addEventListener('click', () => download('png'));
+        document.getElementById('downloadJpgBtn').addEventListener('click', () => download('jpeg'));
+
+        // ---- duplicate text ----
+        document.getElementById('duplicateSlideBtn').addEventListener('click', function() {
+            const current = document.getElementById('textInput').value;
+            document.getElementById('textInput').value = current + ' ✦';
+            updateTextProperties();
+        });
+
+        // ---- reset style ----
         document.getElementById('resetTextBtn').addEventListener('click', function() {
             document.getElementById('textInput').value = 'Carasoul Solvoro';
             document.getElementById('fontSizeSlider').value = 58;
@@ -637,29 +730,7 @@
             updateTextProperties();
         });
 
-        // ----- DUPLICATE SLIDE (just copies current to new textbox, but we simply clone style and reset text) -----
-        document.getElementById('duplicateSlideBtn').addEventListener('click', function() {
-            // optional: prompt for new text, for simplicity we just append "copy"
-            const currentText = document.getElementById('textInput').value;
-            document.getElementById('textInput').value = currentText + ' (copy)';
-            updateTextProperties();
-        });
-
-        // ----- EXPORT PNG / JPG -----
-        function downloadImage(format = 'png') {
-            if (!canvas) return;
-            // ensure high quality original size
-            const dataURL = canvas.toDataURL({ format: format, quality: 1, multiplier: 1 });
-            const link = document.createElement('a');
-            link.download = `carasoul_slide.${format}`;
-            link.href = dataURL;
-            link.click();
-        }
-
-        document.getElementById('downloadPngBtn').addEventListener('click', () => downloadImage('png'));
-        document.getElementById('downloadJpgBtn').addEventListener('click', () => downloadImage('jpeg'));
-
-        // ----- EVENT LISTENERS FOR ALL CONTROLS -----
+        // ---- event listeners ----
         document.getElementById('textInput').addEventListener('input', updateTextProperties);
         document.getElementById('fontSizeSlider').addEventListener('input', updateTextProperties);
         document.getElementById('fontWeightSelect').addEventListener('change', updateTextProperties);
@@ -668,23 +739,39 @@
         document.getElementById('paddingSlider').addEventListener('input', updateTextProperties);
         document.getElementById('shadowToggle').addEventListener('change', updateTextProperties);
 
-        // ---- LOAD SAVED BACKGROUND AND INIT ----
+        // init
         loadBackgroundFromStorage();
-        initTextbox();   // create default textbox
+        initTextbox();
 
-        // ensure perfect centering if any resize happens (not needed, but render)
-        window.addEventListener('resize', () => canvas.renderAll());
-
-        // If background missing, show status
-        if (!localStorage.getItem(STORAGE_KEY)) {
-            document.getElementById('bgStatus').querySelector('span').innerText = '📁 no background saved';
-        }
-
-        // small tweak: slider badges already updated via updateTextProperties, but initial call needed for display.
-        // manually set once
+        // set initial badges
         document.getElementById('fontSizeVal').innerText = document.getElementById('fontSizeSlider').value;
         document.getElementById('lineHeightVal').innerText = document.getElementById('lineHeightSlider').value;
         document.getElementById('paddingVal').innerText = document.getElementById('paddingSlider').value;
+
+        // if no background in storage
+        if (!localStorage.getItem(STORAGE_KEY)) {
+            document.getElementById('bgMessage').innerText = 'upload a background';
+        }
+
+        // extra: drag & drop friendly (optional)
+        const dropArea = document.getElementById('uploadDrop');
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        dropArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const file = dt.files[0];
+            if (file && file.type.match(/image.*/)) {
+                document.getElementById('bgUpload').files = dt.files;
+                // trigger change manually
+                const event = new Event('change', { bubbles: true });
+                document.getElementById('bgUpload').dispatchEvent(event);
+            }
+        });
     })();
 </script>
 </body>
