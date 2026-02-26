@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Carasoul Solvoro · Instagram carousel maker</title>
+    <!-- modern clean font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Fabric.js for canvas manipulation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0c;
+            color: #eaeef2;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 1440px;
+            max-width: 100%;
+            background: #121216;
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+        }
+
+        .app-main {
+            display: flex;
+            flex-direction: row;
+            min-height: 720px;
+        }
+
+        /* left panel — controls */
+        .control-panel {
+            width: 360px;
+            background: #18181e;
+            padding: 32px 24px;
+            border-right: 1px solid #2a2a32;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .panel-header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-header h1 span {
+            background: #2f2f3a;
+            border-radius: 100px;
+            padding: 4px 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #a0a4b0;
+        }
+
+        .control-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #7f8493;
+        }
+
+        .upload-area {
+            background: #22222a;
+            border-radius: 20px;
+            padding: 20px 16px;
+            border: 1px dashed #3b3b48;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .upload-area:hover {
+            border-color: #6161b3;
+            background: #26262e;
+        }
+
+        .upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .upload-label svg {
+            opacity: 0.7;
+        }
+
+        .upload-label span {
+            font-size: 14px;
+            font-weight: 500;
+            color: #cacfe0;
+        }
+
+        .upload-label small {
+            font-size: 12px;
+            color: #6b6f80;
+        }
+
+        #bgUpload {
+            display: none;
+        }
+
+        .bg-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 12px;
+            background: #1b1b22;
+            border-radius: 40px;
+            padding: 8px 12px 8px 16px;
+        }
+
+        .bg-status span {
+            font-size: 13px;
+            color: #b9bed0;
+        }
+
+        .clear-bg-btn {
+            background: none;
+            border: none;
+            color: #a7a9c0;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 6px;
+            transition: 0.2s;
+        }
+
+        .clear-bg-btn:hover {
+            color: #ff8a8a;
+        }
+
+        /* text input */
+        .text-input-wrapper {
+            background: #22222a;
+            border-radius: 20px;
+            padding: 6px 6px 6px 18px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #31313e;
+            transition: 0.15s;
+        }
+
+        .text-input-wrapper:focus-within {
+            border-color: #6d6df0;
+            box-shadow: 0 0 0 2px rgba(109, 109, 240, 0.25);
+        }
+
+        #textInput {
+            background: transparent;
+            border: none;
+            padding: 14px 0;
+            font-size: 15px;
+            width: 100%;
+            color: white;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #textInput::placeholder {
+            color: #5c6070;
+        }
+
+        .slider-group, .select-group, .color-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider-label, .select-label, .color-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #b3b9cc;
+        }
+
+        input[type=range] {
+            width: 100%;
+            height: 5px;
+            background: #2e2e3a;
+            border-radius: 10px;
+            -webkit-appearance: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #7b7bf0;
+            box-shadow: 0 2px 8px black;
+        }
+
+        select, .color-row {
+            background: #22222a;
+            border: 1px solid #363646;
+            border-radius: 40px;
+            padding: 12px 18px;
+            font-size: 15px;
+            color: white;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+        }
+
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 6px 6px 18px;
+        }
+
+        #textColor {
+            width: 48px;
+            height: 38px;
+            border-radius: 30px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .shadow-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #22222a;
+            border-radius: 40px;
+            padding: 8px 18px;
+            border: 1px solid #363646;
+        }
+
+        .shadow-toggle label {
+            font-size: 14px;
+            color: #d3d8ec;
+        }
+
+        /* button group */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .btn {
+            background: #2b2b36;
+            border: 1px solid #3d3d4f;
+            padding: 12px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #eef2fa;
+            cursor: pointer;
+            transition: 0.15s;
+            flex: 1 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: #4b4be0;
+            border-color: #6d6df0;
+            color: white;
+            box-shadow: 0 6px 14px rgba(75, 75, 224, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: #5d5dee;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #4b4b70;
+        }
+
+        .btn-outline:hover {
+            background: #262632;
+        }
+
+        /* right panel — canvas preview */
+        .preview-panel {
+            flex: 1;
+            background: #0d0d10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+        }
+
+        .canvas-wrapper {
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 1 / 1;
+            border-radius: 32px;
+            background: #15151b;
+            box-shadow: 0 30px 40px -20px black, 0 0 0 1px #33333f inset;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #carouselCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border-radius: 28px;
+        }
+
+        /* mobile stack */
+        @media (max-width: 900px) {
+            .app-main {
+                flex-direction: column;
+            }
+            .control-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #2a2a32;
+            }
+            .canvas-wrapper {
+                max-width: 500px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .action-buttons .btn {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+        }
+
+        /* extra polish */
+        .value-badge {
+            background: #2a2a34;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 13px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="app-main">
+        <!-- LEFT CONTROL PANEL (dark, modern) -->
+        <div class="control-panel">
+            <div class="panel-header">
+                <h1>⫸ Carasoul Solvoro <span>v1.0</span></h1>
+            </div>
+
+            <!-- BACKGROUND SECTION -->
+            <div class="control-section">
+                <div class="section-title">background</div>
+                <div class="upload-area">
+                    <label for="bgUpload" class="upload-label">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a8b0d0" stroke-width="1.5"><path d="M3 16l5-5 3 3 4-4 3 3M4 20h16a2 2 0 002-2V6a2 2 0 00-2-2H4a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span>Upload background</span>
+                        <small>JPG, PNG (saved automatically)</small>
+                    </label>
+                    <input type="file" id="bgUpload" accept="image/png, image/jpeg, image/jpg, image/webp">
+                </div>
+                <div class="bg-status" id="bgStatus">
+                    <span>💾 saved in browser</span>
+                    <button class="clear-bg-btn" id="clearBgBtn" title="remove background">✕</button>
+                </div>
+            </div>
+
+            <!-- TEXT INPUT -->
+            <div class="control-section">
+                <div class="section-title">your text</div>
+                <div class="text-input-wrapper">
+                    <input type="text" id="textInput" placeholder="Type caption... e.g. 'New collection'" value="Carasoul Solvoro">
+                </div>
+            </div>
+
+            <!-- TYPOGRAPHY TOOLS -->
+            <div class="control-section">
+                <div class="section-title">styling</div>
+
+                <!-- font size slider -->
+                <div class="slider-group">
+                    <div class="slider-label"><span>Font size</span><span id="fontSizeVal" class="value-badge">58</span></div>
+                    <input type="range" id="fontSizeSlider" min="16" max="140" value="58" step="1">
+                </div>
+
+                <!-- font weight -->
+                <div class="select-group">
+                    <div class="select-label">Weight</div>
+                    <select id="fontWeightSelect">
+                        <option value="normal">Regular</option>
+                        <option value="bold" selected>Bold</option>
+                    </select>
+                </div>
+
+                <!-- color picker -->
+                <div class="color-group">
+                    <div class="color-label">Text color</div>
+                    <div class="color-row">
+                        <span>🎨</span>
+                        <input type="color" id="textColor" value="#ffffff">
+                    </div>
+                </div>
+
+                <!-- line height slider -->
+                <div class="slider-group">
+                    <div class="slider-label"><span>Line height</span><span id="lineHeightVal" class="value-badge">1.3</span></div>
+                    <input type="range" id="lineHeightSlider" min="1.0" max="2.5" value="1.3" step="0.1">
+                </div>
+
+                <!-- padding slider -->
+                <div class="slider-group">
+                    <div class="slider-label"><span>Padding (px)</span><span id="paddingVal" class="value-badge">32</span></div>
+                    <input type="range" id="paddingSlider" min="0" max="120" value="32" step="2">
+                </div>
+
+                <!-- optional text shadow toggle -->
+                <div class="shadow-toggle">
+                    <input type="checkbox" id="shadowToggle" checked>
+                    <label for="shadowToggle">✨ subtle text shadow</label>
+                </div>
+            </div>
+
+            <!-- EXPORT & ACTIONS -->
+            <div class="control-section">
+                <div class="section-title">export slide</div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="downloadPngBtn">📸 PNG</button>
+                    <button class="btn btn-primary" id="downloadJpgBtn">🌅 JPG</button>
+                </div>
+                <div class="action-buttons" style="margin-top: 10px;">
+                    <button class="btn-outline btn" id="duplicateSlideBtn">➕ Duplicate slide</button>
+                    <button class="btn-outline btn" id="resetTextBtn">↺ reset text</button>
+                </div>
+                <p style="font-size:12px; color:#5a6072; margin-top: 18px; text-align:center;">background auto‑saves · 1080x1080</p>
+            </div>
+        </div>
+
+        <!-- RIGHT PREVIEW (canvas) -->
+        <div class="preview-panel">
+            <div class="canvas-wrapper">
+                <canvas id="carouselCanvas" width="1080" height="1080"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- INIT FABRIC CANVAS (1080x1080) -----
+        const canvasElement = document.getElementById('carouselCanvas');
+        const canvas = new fabric.Canvas(canvasElement, {
+            enableRetinaScaling: true,
+            width: 1080,
+            height: 1080,
+            backgroundColor: '#1a1a20',  // fallback dark
+            preserveObjectStacking: false
+        });
+
+        // ----- GLOBAL REFERENCES -----
+        let textbox = null;           // fabric.Textbox instance
+        const STORAGE_KEY = 'carasoul_solvoro_bg';
+
+        // ----- HELPER: COVER SCALE FOR BACKGROUND -----
+        function setBackgroundCover(imgElement) {
+            const scale = Math.max(canvas.width / imgElement.width, canvas.height / imgElement.height);
+            imgElement.set({
+                scaleX: scale,
+                scaleY: scale,
+                left: (canvas.width - imgElement.width * scale) / 2,
+                top: (canvas.height - imgElement.height * scale) / 2,
+                originX: 'left',
+                originY: 'top'
+            });
+            canvas.setBackgroundImage(imgElement, canvas.renderAll.bind(canvas));
+        }
+
+        // ----- LOAD BACKGROUND FROM LOCALSTORAGE (ON START) -----
+        function loadBackgroundFromStorage() {
+            const savedDataURL = localStorage.getItem(STORAGE_KEY);
+            if (savedDataURL) {
+                fabric.Image.fromURL(savedDataURL, (img) => {
+                    setBackgroundCover(img);
+                }, { crossOrigin: 'anonymous' });
+            }
+        }
+
+        // ----- SAVE BACKGROUND TO LOCALSTORAGE (AS DATAURL) -----
+        function saveBackgroundToStorage(dataURL) {
+            try {
+                localStorage.setItem(STORAGE_KEY, dataURL);
+                document.getElementById('bgStatus').querySelector('span').innerText = '💾 background saved';
+            } catch (e) {
+                alert('Background too large for storage, try a smaller image.');
+            }
+        }
+
+        // ----- UPLOAD HANDLER -----
+        document.getElementById('bgUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const dataURL = event.target.result;
+                fabric.Image.fromURL(dataURL, (img) => {
+                    setBackgroundCover(img);
+                    saveBackgroundToStorage(dataURL);
+                }, { crossOrigin: 'anonymous' });
+            };
+            reader.readAsDataURL(file);
+            // reset input to allow re-upload same file
+            this.value = '';
+        });
+
+        // ----- CLEAR BACKGROUND -----
+        document.getElementById('clearBgBtn').addEventListener('click', function() {
+            canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
+            localStorage.removeItem(STORAGE_KEY);
+            document.getElementById('bgStatus').querySelector('span').innerText = '⛔ no background';
+        });
+
+        // ----- CREATE TEXTBOX (centered once, then live update) -----
+        function initTextbox() {
+            if (textbox) canvas.remove(textbox);
+
+            const text = document.getElementById('textInput').value || 'Carasoul Solvoro';
+            const fontSize = parseInt(document.getElementById('fontSizeSlider').value, 10);
+            const fontWeight = document.getElementById('fontWeightSelect').value;
+            const color = document.getElementById('textColor').value;
+            const lineHeight = parseFloat(document.getElementById('lineHeightSlider').value);
+            const padding = parseInt(document.getElementById('paddingSlider').value, 10);
+            const shadowEnabled = document.getElementById('shadowToggle').checked;
+
+            textbox = new fabric.Textbox(text, {
+                left: canvas.width / 2,
+                top: canvas.height / 2,
+                originX: 'center',
+                originY: 'center',
+                fontSize: fontSize,
+                fontWeight: fontWeight,
+                fill: color,
+                lineHeight: lineHeight,
+                padding: padding,
+                textAlign: 'center',
+                fontFamily: 'Inter, sans-serif',
+                width: 880,              // fixed width for wrapping (1080 - 200 margin)
+                shadow: shadowEnabled ? 'rgba(0,0,0,0.45) 0px 8px 16px' : '',
+                splitByGrapheme: true,    // better wrapping
+                hasControls: false,        // keep clean, no borders
+                hasBorders: false,
+                lockScalingX: true,
+                lockScalingY: true,
+                lockRotation: true,
+                selectable: false,
+                evented: false
+            });
+
+            canvas.add(textbox);
+            canvas.renderAll();
+        }
+
+        // ----- UPDATE TEXTBOX PROPERTIES (called on any input change) -----
+        function updateTextProperties() {
+            if (!textbox) {
+                initTextbox();
+                return;
+            }
+
+            const text = document.getElementById('textInput').value || ' ';
+            const fontSize = parseInt(document.getElementById('fontSizeSlider').value, 10);
+            const fontWeight = document.getElementById('fontWeightSelect').value;
+            const color = document.getElementById('textColor').value;
+            const lineHeight = parseFloat(document.getElementById('lineHeightSlider').value);
+            const padding = parseInt(document.getElementById('paddingSlider').value, 10);
+            const shadowEnabled = document.getElementById('shadowToggle').checked;
+
+            textbox.set({
+                text: text,
+                fontSize: fontSize,
+                fontWeight: fontWeight,
+                fill: color,
+                lineHeight: lineHeight,
+                padding: padding,
+                shadow: shadowEnabled ? 'rgba(0,0,0,0.45) 0px 8px 16px' : ''
+            });
+
+            canvas.renderAll();
+
+            // update value badges
+            document.getElementById('fontSizeVal').innerText = fontSize;
+            document.getElementById('lineHeightVal').innerText = lineHeight.toFixed(1);
+            document.getElementById('paddingVal').innerText = padding;
+        }
+
+        // ----- RESET TEXT TO DEFAULT -----
+        document.getElementById('resetTextBtn').addEventListener('click', function() {
+            document.getElementById('textInput').value = 'Carasoul Solvoro';
+            document.getElementById('fontSizeSlider').value = 58;
+            document.getElementById('fontWeightSelect').value = 'bold';
+            document.getElementById('textColor').value = '#ffffff';
+            document.getElementById('lineHeightSlider').value = 1.3;
+            document.getElementById('paddingSlider').value = 32;
+            document.getElementById('shadowToggle').checked = true;
+            updateTextProperties();
+        });
+
+        // ----- DUPLICATE SLIDE (just copies current to new textbox, but we simply clone style and reset text) -----
+        document.getElementById('duplicateSlideBtn').addEventListener('click', function() {
+            // optional: prompt for new text, for simplicity we just append "copy"
+            const currentText = document.getElementById('textInput').value;
+            document.getElementById('textInput').value = currentText + ' (copy)';
+            updateTextProperties();
+        });
+
+        // ----- EXPORT PNG / JPG -----
+        function downloadImage(format = 'png') {
+            if (!canvas) return;
+            // ensure high quality original size
+            const dataURL = canvas.toDataURL({ format: format, quality: 1, multiplier: 1 });
+            const link = document.createElement('a');
+            link.download = `carasoul_slide.${format}`;
+            link.href = dataURL;
+            link.click();
+        }
+
+        document.getElementById('downloadPngBtn').addEventListener('click', () => downloadImage('png'));
+        document.getElementById('downloadJpgBtn').addEventListener('click', () => downloadImage('jpeg'));
+
+        // ----- EVENT LISTENERS FOR ALL CONTROLS -----
+        document.getElementById('textInput').addEventListener('input', updateTextProperties);
+        document.getElementById('fontSizeSlider').addEventListener('input', updateTextProperties);
+        document.getElementById('fontWeightSelect').addEventListener('change', updateTextProperties);
+        document.getElementById('textColor').addEventListener('input', updateTextProperties);
+        document.getElementById('lineHeightSlider').addEventListener('input', updateTextProperties);
+        document.getElementById('paddingSlider').addEventListener('input', updateTextProperties);
+        document.getElementById('shadowToggle').addEventListener('change', updateTextProperties);
+
+        // ---- LOAD SAVED BACKGROUND AND INIT ----
+        loadBackgroundFromStorage();
+        initTextbox();   // create default textbox
+
+        // ensure perfect centering if any resize happens (not needed, but render)
+        window.addEventListener('resize', () => canvas.renderAll());
+
+        // If background missing, show status
+        if (!localStorage.getItem(STORAGE_KEY)) {
+            document.getElementById('bgStatus').querySelector('span').innerText = '📁 no background saved';
+        }
+
+        // small tweak: slider badges already updated via updateTextProperties, but initial call needed for display.
+        // manually set once
+        document.getElementById('fontSizeVal').innerText = document.getElementById('fontSizeSlider').value;
+        document.getElementById('lineHeightVal').innerText = document.getElementById('lineHeightSlider').value;
+        document.getElementById('paddingVal').innerText = document.getElementById('paddingSlider').value;
+    })();
+</script>
+</body>
+</html>
