@@ -1,21 +1,45 @@
-// service-worker.js
-self.addEventListener("install", event => {
+const CACHE_NAME = 'flowcrm-v1';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/login.html',
+  '/dashboard.html',
+  '/manifest.json',
+  '/logo.png',
+  '/logo-192.png',
+  '/logo-512.png',
+  // Add any external resources you want to cache (e.g., Tailwind CDN, FontAwesome)
+  'https://cdn.tailwindcss.com',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css',
+  'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js',
+  'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js',
+  'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js'
+];
+
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open("solvoro-cache").then(cache => {
-      return cache.addAll([
-        "./",
-        "./index.html",
-        "./manifest.json",
-        "./logo.png"
-      ]);
-    })
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
   );
 });
 
-self.addEventListener("fetch", event => {
+self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
+    caches.match(event.request)
+      .then(response => response || fetch(event.request))
+  );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cache => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
+        })
+      );
     })
   );
 });
